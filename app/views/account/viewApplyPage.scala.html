@@ -1,0 +1,137 @@
+@()(implicit session: Session)
+
+@report.main("查看申请") {
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-external-link   text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;查看申请&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered" id="table" style="text-align: center;">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+            $(function () {
+                $.post("@routes.ReportController.getAllApplyData()", (data) => {
+                    $("#table").bootstrapTable({
+                        data: data,
+                        columns: [
+                            [{
+                                field: "applyCode",
+                                title: "申请编号",
+                                rowspan: 2,
+                                formatter:function (value,row) {
+                                    return `<a href='/FOSO/account/applyDetailPage?id=${row.id}' target="_blank">${row.applyCode}</a>`
+                                }
+                            }, {
+                                field: "applyPerson",
+                                title: "申请人",
+                                rowspan: 2
+                            }, {
+                                field: "times",
+                                title: "申请时间",
+                                rowspan: 2
+                            }, {
+                                field: "sample",
+                                title: "病原微生物名称",
+                                rowspan: 2
+                            },{
+                                title: "课题组",
+                                colspan: 3
+                            }, {
+                                title: "接收部门",
+                                colspan: 3
+                            },{
+                                title: "项目",
+                                colspan: 3
+                            }], [{
+                                field: "team",
+                                title: "负责人"
+                            }, {
+                                field: "teamAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.teamAudit);
+                                }
+                            },  {
+                                field: "teamAuditTime",
+                                title: "审核时间"
+                            },{
+                                field: "department",
+                                title: "负责人"
+                            },{
+                                field: "departmentAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.departmentAudit);
+                                }
+                            }, {
+                                field: "teamAuditTime",
+                                title: "审核时间"
+                            },{
+                                field: "project",
+                                title: "负责人"
+                            }, {
+                                field: "projectAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.projectAudit);
+                                }
+                            },{
+                                field: "teamAuditTime",
+                                title: "审核时间"
+                            }]
+                        ]
+                    })
+                })
+            })
+
+            function validAudit(obj) {
+                if (obj === "0") {
+                    return "未审核";
+                } else if (obj === "1") {
+                    return `<span style="color: green">同意</span>`;
+                } else if (obj === "2") {
+                    return `<span style="color: red">不同意</span>`;
+                }
+            }
+
+
+            function auditSign(obj) {
+                if (obj === "0") {
+                    return "未选择";
+                } else if (obj === "1") {
+                    return `线上手签`;
+                } else if (obj === "2") {
+                    return `线下签名`;
+                }
+            }
+
+
+
+    </script>
+
+
+}

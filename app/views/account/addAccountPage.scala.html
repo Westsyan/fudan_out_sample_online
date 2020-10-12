@@ -1,0 +1,162 @@
+@()(implicit session: Session)
+@report.main("") {
+
+    <style>
+
+            .col-form-label:hover {
+                cursor: pointer;
+            }
+
+            .post-label {
+                margin-left: 20px;
+            }
+
+    </style>
+
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-user  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;添加账号&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+
+                        <form id="form">
+
+                            <div class="row" id="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 手机号:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="phone">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 姓名:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 职位:</label>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label post-label "><input type="radio" name="post" value="申请人" checked>
+                                                申请人</label>
+                                            <label class="col-form-label  post-label"><input type="radio" name="post" value="课题组负责人">
+                                                课题组负责人</label>
+                                            <label class="col-form-label post-label "><input type="radio" name="post" value="接收部门负责人">
+                                                接收部门负责人</label>
+                                            <label class="col-form-label post-label "><input type="radio" name="post" value="项目负责人">
+                                                项目负责人</label>
+                                            <label class="col-form-label post-label "><input type="radio" name="post" value="课题组负责人和项目负责人">
+                                                课题组负责人和项目负责人</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-2"></div>
+                                        <button type="button" class="btn btn-primary" style="width: 200px" onclick="ApplyReport()">
+                                            新增人员</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+            $(function () {
+                addFormValidation();
+            })
+
+            function ApplyReport() {
+                let form = $("#form");
+                let fv = form.data("formValidation");
+                fv.validate();
+                if (fv.isValid()) {
+                    $.ajax({
+                        url: "@routes.AccountController.addUser()",
+                        type: "post",
+                        data: $("#form").serialize(),
+                        success: function (data) {
+                            if (data.code === 200) {
+                                swal("\n成功", "新增成功！", "success")
+                            }
+                        }
+                    })
+                }
+            }
+
+
+            function addFormValidation() {
+                $('#form').formValidation({
+                    framework: 'bootstrap',
+                    icon: {
+                        valid: 'glyphicon glyphicon-ok',
+                        invalid: 'glyphicon glyphicon-remove',
+                        validating: 'glyphicon glyphicon-refresh'
+                    },
+                    fields: {
+                        phone: {
+                            validators: {
+                                notEmpty: {
+                                    message: '手机号不能为空!'
+                                },
+                                regexp: {
+                                    regexp: '^1(3|4|5|7|8)\\d{9}$',
+                                    message: "手机号格式不正确，请重新输入！"
+                                },
+                                remote: {
+                                    type: 'POST',
+                                    url: '/phoneIsExsit',
+                                    message: `手机号已存在！`,
+                                    delay: 1000
+                                },
+                            }
+                        },
+                        name: {
+                            validators: {
+                                notEmpty: {
+                                    message: "姓名不能为空！"
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+
+
+
+    </script>
+
+
+}

@@ -1,0 +1,86 @@
+.brand-logo{
+    text-align: center;
+    font-size: 18px;
+}
+
+.code{
+    width: 60px;
+    margin-left: 5px;
+}
+
+.input-height{
+    height: 45px;
+}
+
+/*formvalidation验证位置*/
+.help-block{
+    position: absolute;
+    display: block;
+    color: red;
+}
+
+
+.collapse{
+    visibility: unset;
+}
+
+.mdi-close {
+    color: red;
+}
+
+.mdi-check {
+    color: #2D8B67;
+}
+
+.help-block {
+    color: red;
+}
+
+a:hover{
+    text-decoration: unset !important;
+}
+
+
+.form-horizontal .has-feedback .form-control-feedback {
+    right: -20px;
+}
+
+.form-control-feedback {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    display: block;
+    width: 34px;
+    height: 34px;
+    line-height: 45px;
+    text-align: center;
+    pointer-events: none;
+}
+
+select.form-control {
+    color: black !important;
+}
+
+.col-form-label {
+    text-align: right;
+}
+
+.my-brand-logo{
+    display: none;
+}
+
+.my-main-panel {
+    margin-left: 70px;
+}
+
+.page-item.active .page-link {
+    background-color: #2D8B67;
+    border-color: #2D8B67;
+}
+
+.page-link {
+    color: #2D8B67;
+}
+
+

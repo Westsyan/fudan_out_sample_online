@@ -1,0 +1,136 @@
+@import models.Tables.ApplyreportRow
+@import models.Utils
+@(row:ApplyreportRow,applyPerson:String,team:String,department:String,project:String)(implicit session: Session)
+@report.main("查看申请") {
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-external-link   text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;<a href="@routes.AccountController.viewApplyPage()">查看申请</a>&nbsp;&nbsp;/</p>
+                            <p  class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;@{row.applyCode}&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered" id="table" style="text-align: center;">
+                            <thead>
+                                <tr>
+                                    <th width="20%">申请编号</th>
+                                    <td colspan="4">@row.applyCode</td>
+                                </tr>
+                                <tr>
+                                    <th>申请时间</th>
+                                    <td colspan="4">@row.times</td>
+                                </tr>
+                                <tr>
+                                    <th>申请人</th>
+                                    <td colspan="4">@applyPerson</td>
+                                </tr>
+                                <tr>
+                                    <th width="20%">项目名称</th>
+                                    <td colspan="4">@row.projectName</td>
+                                </tr>
+                                <tr>
+                                    <th width="20%">项目编号</th>
+                                    <td colspan="4">@row.projectCode</td>
+                                </tr>
+                                <tr>
+                                    <th>病原微生物名称</th>
+                                    <td colspan="4">@row.sampleName</td>
+                                </tr>
+                                <tr>
+                                    <th>样品名称/类型</th>
+                                    <td colspan="4">@row.sampleType</td>
+                                </tr>
+                                <tr>
+                                    <th>灭活方式</th>
+                                    <td colspan="4">@row.inactivation</td>
+                                </tr>
+                                <tr>
+                                    <th>灭活方式是否经过验证</th>
+                                    <td colspan="4">@row.verifiedInactivation</td>
+                                </tr>
+                                <tr>
+                                    <th>样品编号</th>
+                                    <td colspan="4">@row.sampleCode</td>
+                                </tr>
+                                <tr>
+                                    <th>带出数量</th>
+                                    <td colspan="4">@row.outNums</td>
+                                </tr>
+                                <tr>
+                                    <th>用途</th>
+                                    <td colspan="4">@row.application</td>
+                                </tr>
+                                <tr>
+                                    <th>带出后保存地点</th>
+                                    <td colspan="4">@row.position</td>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">课题组负责人审核</th>
+                                    <td width="15%">审核结果</td>
+                                    <td width="25%">@{Utils.validApplyStatus(row.teamAudit)}</td>
+                                    <td width="15%">审核人</td>
+                                    <td width="25%">@team</td>
+                                </tr>
+                                <tr>
+                                    <td>审核时间</td>
+                                    <td>@row.teamTime</td>
+                                    <td>审核人签字</td>
+                                    <td>@{Utils.validApplySign(row.teamSign)}</td>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">接收部门审核</th>
+                                    <td>审核结果</td>
+                                    <td>@{Utils.validApplyStatus(row.departmentAudit)}</td>
+                                    <td>审核人</td>
+                                    <td>@department</td>
+                                </tr>
+                                <tr>
+                                    <td>审核时间</td>
+                                    <td>@row.departmentTime</td>
+                                    <td>审核人签字</td>
+                                    <td>@{Utils.validApplySign(row.departmentSign)}</td>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">项目负责人审核</th>
+                                    <td>审核结果</td>
+                                    <td>@{Utils.validApplyStatus(row.projectAudit)}</td>
+                                    <td>审核人</td>
+                                    <td>@project</td>
+                                </tr>
+                                <tr>
+                                    <td>审核时间</td>
+                                    <td>@row.projectTime</td>
+                                    <td>审核人签字</td>
+                                    <td>@{Utils.validApplySign(row.projectSign)}</td>
+                                </tr>
+
+
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $("#viewApply").addClass("active")
+        })
+
+
+    </script>
+
+}

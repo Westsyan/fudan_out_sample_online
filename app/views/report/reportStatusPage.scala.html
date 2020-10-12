@@ -1,0 +1,213 @@
+@()(implicit session: Session)
+@report.main("") {
+
+    <style>
+
+            .form-group {
+                margin-bottom: 0;
+            }
+
+            .form-control {
+                height: 1.5rem;
+            }
+
+            .inactivation_other_input {
+                border: 1px solid #ddd;
+                padding-top: 0.45rem;
+                padding-bottom: 0.45rem;
+            }
+
+            .col-form-label {
+                padding-top: 0.45rem;
+                padding-bottom: 0.45rem;
+                margin-right: 0.75rem;
+            }
+
+            .col-form-label:hover {
+                cursor: pointer;
+            }
+
+            .col-form-label > span {
+                margin-left: 0.3rem;
+            }
+
+            .form-control-feedback {
+                top: -8px;
+                right: 7px;
+            }
+
+
+            .table thead tr th {
+                vertical-align: middle !important;
+            }
+
+
+    </style>
+
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-tv  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;申请状态&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered" id="table" style="text-align: center;">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="commitBackdrop" data-backdrop="commit" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="commitBackdropLabel" >
+        <div class="modal-dialog modal-dialog-scrollable  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">本人承诺</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <h2 style="text-align: center">本人承诺</h2>
+                        <p style="font-size: 1rem;
+                            line-height: 1.5rem">1. 所带样品均经过彻底得灭活处理且灭活方法均经过验证，所有样品表面均经过彻底的消毒;</p>
+                        <p style="font-size: 1rem;
+                            line-height: 1.5rem">2. 填写的所有内容均属实，如不属实，一切后果自负。</p>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex;
+                    flex-direction: column">
+                   <button type="button" class="btn btn-primary" id="uploadBtn" disabled></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+            $(function () {
+                $.post("@routes.ReportController.getReportStatusData()", (data) => {
+                    $("#table").bootstrapTable({
+                        data: data,
+                        columns: [
+                            [{
+                                field: "applyCode",
+                                title: "申请编号",
+                                rowspan: 2
+                            }, {
+                                field: "sample",
+                                title: "病原微生物名称",
+                                rowspan: 2
+                            }, {
+                                field: "times",
+                                title: "申请时间",
+                                rowspan: 2
+                            }, {
+                                title: "课题组",
+                                colspan: 2
+                            }, {
+                                title: "接收部门",
+                                colspan: 2
+                            },{
+                                title: "项目",
+                                colspan: 2
+                            },{
+                                field: "download",
+                                title: "下载申请报告",
+                                rowspan: 2,
+                                formatter: function (value, row) {
+                                    return `<button class="btn btn-primary" onclick="OpenCommit('${row.id}')" style="padding: 0.25rem 0.95rem;"><i class="fa fa-download" style="font-size: 1rem"></i></button>`;
+                                }
+                            }], [{
+                                field: "team",
+                                title: "负责人"
+                            }, {
+                                field: "teamAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.teamAudit);
+                                }
+                            }, {
+                                field: "department",
+                                title: "负责人"
+                            },{
+                                field: "departmentAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.departmentAudit);
+                                }
+                            }, {
+                                field: "project",
+                                title: "负责人"
+                            }, {
+                                field: "projectAudit",
+                                title: "审核状态",
+                                formatter: function (value, row) {
+                                    return validAudit(row.projectAudit);
+                                }
+                            }]
+                        ]
+                    })
+                })
+            })
+
+            function validAudit(obj) {
+                if (obj === "0") {
+                    return "未审核";
+                } else if (obj === "1") {
+                    return `<span style="color: green">同意</span>`;
+                } else if (obj === "2") {
+                    return `<span style="color: red">不同意</span>`;
+                }
+            }
+
+            function time(s) {
+                let show =$("#commitBackdrop").attr("class");
+                if (s == 0 || (show == "modal fade" && s < 30)) {
+                    $("#uploadBtn").text("确认");
+                    $("#uploadBtn").removeAttr("disabled");
+                } else {
+                    $("#uploadBtn").text(s + " 秒");
+                    setTimeout(function () {
+                        time(s - 1)
+                    }, 1000)
+                }
+            }
+
+
+            function OpenCommit(id) {
+                $("#commitBackdrop").modal("show")
+                $("#uploadBtn").attr("onclick","Download(" + id +")")
+                $("#uploadBtn").text("确认");
+                $("#uploadBtn").removeAttr("disabled");
+
+                //   $("#uploadBtn").attr("disabled","disabled");
+              //  time(30)
+            }
+
+            function Download(id) {
+                $("#commitBackdrop").modal("hide")
+                window.open("/FOSO/report/downloadRepoprt?id=" + id)
+            }
+
+
+    </script>
+
+}

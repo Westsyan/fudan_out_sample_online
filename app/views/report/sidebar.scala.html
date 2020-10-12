@@ -1,0 +1,94 @@
+@(post: String)
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+
+        @if(post == "申请人") {
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.ReportController.reportApplyPage()" >
+
+                    <i class="fa fa-pencil-square-o  menu-icon"></i>
+                    <span class="menu-title">填写申请</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.ReportController.reportStatusPage()" >
+
+                    <i class="fa fa-tv  menu-icon"></i>
+                    <span class="menu-title">申请状态</span>
+                </a>
+            </li>
+        }
+
+        @if(post == "管理员") {
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.AccountController.managePage()" >
+
+                    <i class="fa fa-user-o  menu-icon"></i>
+                    <span class="menu-title">账号管理</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.AccountController.addAccountPage()" >
+
+                    <i class="fa fa-user  menu-icon"></i>
+                    <span class="menu-title">添加账号</span>
+                </a>
+            </li>
+
+            <li class="nav-item" id="viewApply">
+                <a class="nav-link" href="@routes.AccountController.viewApplyPage()" >
+                    <i class="fa fa-external-link  menu-icon"></i>
+                    <span class="menu-title">查看申请</span>
+                </a>
+            </li>
+        }
+
+        @if(post == "课题组负责人" || post == "接收部门负责人" || post == "项目负责人") {
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.AuditController.auditPage()" >
+
+                    <i class="fa fa-external-link menu-icon"></i>
+                    <span class="menu-title">申请审核</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.SignatureController.uploadSignPage()" >
+
+                    <i class="fa fa-upload menu-icon"></i>
+                    <span class="menu-title">上传签名</span>
+                </a>
+            </li>
+        }
+
+        @if(post == "课题组负责人和项目负责人" ) {
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.AuditController.teamAuditPage()" >
+                    <i class="fa fa-external-link menu-icon"></i>
+                    <span class="menu-title">课题组申请审核</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.AuditController.projectAuditPage()" >
+                    <i class="fa fa-external-link menu-icon"></i>
+                    <span class="menu-title">项目申请审核</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@routes.SignatureController.uploadSignPage()" >
+
+                    <i class="fa fa-upload menu-icon"></i>
+                    <span class="menu-title">上传签名</span>
+                </a>
+            </li>
+        }
+
+
+    </ul>
+</nav>
+
+
+

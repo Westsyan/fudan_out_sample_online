@@ -1,0 +1,138 @@
+@user.main("注册") {
+
+    <style>
+        label{
+            cursor: pointer;
+        }
+    </style>
+
+    <div class="box-right" style="height: 870px">
+
+        <p class="page-title">注册</p>
+
+        <form id="form">
+            <div class="row form-group">
+                <input type="text" placeholder="手机号" class="form-input" name="phone"/>
+                <i class="fa fa-user fa-icon"></i>
+            </div>
+
+            <div class="row form-group">
+                <input type="password" placeholder="请输入密码" class="form-input" name="pwd"/>
+                <i class="fa fa-unlock-alt fa-icon"></i>
+            </div>
+
+            <div class="row form-group">
+                <input type="password" placeholder="请再次输入密码" class="form-input" name="rPwd"/>
+                <i class="fa fa-unlock-alt fa-icon"></i>
+            </div>
+
+
+            <div class="row form-group" id="post1">
+                <input type="text" placeholder="姓名" class="form-input" name="name"/>
+                <i class="fa fa-user-circle fa-icon"></i>
+            </div>
+
+            <div class="row form-group" >
+                <span>职位 ： </span>
+                <table style="width: 400px;padding-left: 20px;margin-top: -6px">
+                    <tbody>
+                        <tr>
+                            <td style="line-height: 35px"><label><input type="radio" name="post" value="15" checked /> 申请人</label></td>
+                            <td><label><input type="radio" name="post"  value="14" />课题组负责人</label></td>
+                        </tr>
+                        <tr>
+                            <td><label><input type="radio" name="post"  value="13"/>接收部门负责人</label></td>
+                            <td><label><input type="radio" name="post"  value="12"/>项目负责人</label></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row form-group" id="post1">
+                <input type="text" placeholder="项目" class="form-input" name="project"/>
+                <i class="fa fa-user-circle fa-icon"></i>
+            </div>
+
+            <div class="row form-group" id="post2">
+                <input type="text" placeholder="接受部门" class="form-input" name="department"/>
+                <i class="fa fa-user-circle fa-icon"></i>
+            </div>
+
+            <div class="row form-group" id="post3">
+                <input type="text" placeholder="课题组" class="form-input" name="team"/>
+                <i class="fa fa-user-circle fa-icon"></i>
+            </div>
+
+
+            <div class="row form-group">
+                <input type="text" placeholder="验证码" class="form-input" name="code" style="width: 70%"/>
+                <i class="fa fa-shield  fa-icon"></i>
+                <input type="button" class="form-input code" id="code" onclick="createCode('#form')" value="获取验证码" />
+                <small class="help-block" id="code-error"></small>
+
+            </div>
+
+            <div class="row">
+                <button type="button" class="btn" onclick="Register()">立即注册</button>
+            </div>
+
+
+            <div class="row-login">
+
+                <p>已有账号？请<a href="@routes.UserController.loginPage()">登录</a></p>
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+    <script>
+
+
+
+            $(function () {
+
+                registerFormValidation();
+                getPost();
+
+            })
+
+            $("input[name='post']").click(function () {
+                getPost();
+            })
+
+
+
+
+            function Register() {
+                $("#code-error").empty();
+                let form = $("#form");
+                form.formValidation("revalidateField", "code");
+                let fv = form.data("formValidation");
+                fv.validate();
+                if (fv.isValid()) {
+                    $.ajax({
+                        url: "/register",
+                        type: "post",
+                        data: $("#form").serialize(),
+                        success: function (data) {
+                            createCode();
+                            if (data.valid === "false") {
+                                swal("错误", data.msg, "error")
+                            } else {
+                                //form.submit()由于在firefox中不执行，故换成：
+                                window.location.href = "/registerSuccessPage"
+                            }
+                        }
+                    })
+                }
+            }
+
+
+
+
+    </script>
+
+}

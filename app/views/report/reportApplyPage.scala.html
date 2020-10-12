@@ -1,0 +1,332 @@
+@()(implicit session: Session)
+@report.main("填写申请") {
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("select2-4.0.3/dist/css/select2.css")">
+
+    <style>
+
+            .form-group {
+                margin-bottom: 0;
+            }
+
+            .form-control {
+                height: 1.5rem;
+            }
+
+            .inactivation_other_input {
+                border: 1px solid #ddd;
+                padding-top: 0.45rem;
+                padding-bottom: 0.45rem;
+            }
+
+            .col-form-label {
+                padding-top: 0.45rem;
+                padding-bottom: 0.45rem;
+                margin-right: 0.75rem;
+            }
+
+            .col-form-label:hover {
+                cursor: pointer;
+            }
+
+            .col-form-label > span {
+                margin-left: 0.3rem;
+            }
+
+            .form-control-feedback {
+                top: -8px;
+                right: 7px;
+            }
+
+            .help-block {
+                position: absolute;
+                top: -8px;
+                right: -60px;
+                z-index: 2;
+                display: block;
+                height: 34px;
+                line-height: 45px;
+                text-align: center;
+                pointer-events: none;
+            }
+    </style>
+
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-pencil-square-o  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;填写申请&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+
+                        <form id="form">
+                            <div class="row" id="row">
+
+                                <p class="card-title" style="margin-left: 100px">申请信息</p>
+
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 项目名称:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="project_name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 项目编号:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="project_code">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 病原微生物名称:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="sample_name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 样品名称/类型:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="sample_type">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 灭活方式:</label>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="2%多聚甲醛" checked>
+                                                2%多聚甲醛</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="0.2%TritonX-100">
+                                                0.2%TritonX-100</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="0.2%Saponin">
+                                                0.2%Saponin</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="2%多聚甲醛+0.2%TritonX-100">
+                                                2%多聚甲醛+0.2%TritonX-100</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="2%多聚甲醛+0.2%Saponin">
+                                                2%多聚甲醛+0.2%Saponin</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="2%多聚甲醛+2%戊二醛">
+                                                2%多聚甲醛+2%戊二醛</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="RNA抽提试剂盒裂解液">
+                                                RNA抽提试剂盒裂解液</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="蛋白裂解液">
+                                                蛋白裂解液</label>
+                                            <label class="col-form-label "><input type="radio" name="inactivation" value="4%多聚甲醛">
+                                                4%多聚甲醛</label>
+                                            <label class="col-form-label " style="margin-top: -7px">
+                                                <input type="radio" name="inactivation" value="other" >
+                                                其它方式
+                                                <input type="text" name="inactivation_other" class="inactivation_other_input" style="margin-left: 10px"/></label>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 灭活方式是否经过验证:</label>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label "><input type="radio" name="verified_inactivation" checked>
+                                                是</label>
+                                            <label class="col-form-label "><input type="radio" name="verified_inactivation">
+                                                否</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 样品编号:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="sample_code">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 带出数量:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="out_nums">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 用途:</label>
+                                        <div class="col-sm-4">
+                                            <textarea class="form-control" name="application" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" style="margin-top: 20px">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 带出后保存地点:</label>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="position">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="card-title" style="margin-left: 100px">审核人员</p>
+
+                                <div class="col-md-12" style="margin-top: 20px">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 课题组负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="team" id="team"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12" style="margin-top: 20px">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 接受部门负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="department" id="department"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12" style="margin-top: 20px">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 项目负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="project" id="project"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12" style="margin-top: 20px">
+                                    <div class="form-group row">
+                                        <div class="col-sm-2"></div>
+                                        <button type="button" class="btn btn-primary" style="width: 200px" onclick="ApplyReport()">
+                                            申请</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="@routes.Assets.versioned("select2-4.0.3/dist/js/select2.js")" type="text/javascript"></script>
+
+    <script>
+
+            $(function () {
+                $.post("@routes.ReportController.getAllAuditPeople()", (data) => {
+                    $("#team").select2({data:data.team})
+                    $("#department").select2({data:data.department})
+                    $("#project").select2({data:data.project})
+                })
+
+                Formvalidation();
+            })
+
+            function ApplyReport() {
+                let form = $("#form");
+                let fv = form.data("formValidation");
+                fv.validate();
+                if (fv.isValid()) {
+                    $.ajax({
+                        url: "@routes.ReportController.applyReport()",
+                        type: "post",
+                        data: form.serialize(),
+                        success: function (data) {
+                            if (data.code === 200) {
+                                swal("\n成功", "申请成功，请等待审核", "success")
+                            } else {
+                                swal("错误", data.code, "error")
+                            }
+                        }
+                    })
+                }
+            }
+
+            function Formvalidation() {
+                $('#form').formValidation({
+                    framework: 'bootstrap',
+                    icon: {
+                        valid: 'mdi mdi-check',
+                        invalid: 'mdi mdi-close',
+                        validating: 'mdi mdi-refresh'
+                    },
+                    fields: {
+                        sample_name: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        },
+                        sample_type: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        },
+                        sample_code: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        },
+                        out_nums: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        },
+                        application: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        },
+                        position: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+
+
+    </script>
+
+}

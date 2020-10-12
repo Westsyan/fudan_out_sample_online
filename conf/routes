@@ -1,0 +1,59 @@
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+GET           /                                           controllers.HomeController.index
+GET           /loginPage                                  controllers.UserController.loginPage
+POST          /msgLogin                                   controllers.UserController.msgLogin
+POST          /phoneIsExsit                               controllers.UserController.phoneIsExsit
+POST          /getValidCode                               controllers.UserController.getValidCode
+
+#GET           /testLoginPage                              controllers.UserController.testLoginPage
+#POST          /pwdLogin                                   controllers.UserController.pwdLogin
+#GET           /registerPage                               controllers.UserController.registerPage
+#POST          /register                                   controllers.UserController.register
+#GET           /registerSuccessPage                        controllers.UserController.registerSuccessPage
+
+
+GET           /FOSO/report/reportApplyPage                controllers.ReportController.reportApplyPage
+POST          /FOSO/report/applyReport                    controllers.ReportController.applyReport
+GET           /FOSO/report/reportStatusPage               controllers.ReportController.reportStatusPage
+POST          /FOSO/report/getReportStatusData            controllers.ReportController.getReportStatusData
+POST          /FOSO/report/getAllAuditPeople              controllers.ReportController.getAllAuditPeople
+GET           /FOSO/report/downloadRepoprt                controllers.ReportController.downloadRepoprt(id:Int)
+POST          /FOSO/report/getAllApplyData                controllers.ReportController.getAllApplyData
+
+GET           /FOSO/account/managePage                    controllers.AccountController.managePage
+POST          /FOSO/account/getAllUser                    controllers.AccountController.getAllUser
+GET           /FOSO/account/addAccountPage                controllers.AccountController.addAccountPage
+POST          /FOSO/account/addUser                       controllers.AccountController.addUser
+DELETE        /FOSO/account/deleteUserById                controllers.AccountController.deleteUserById(id:Int)
+GET           /FOSO/account/viewApplyPage                 controllers.AccountController.viewApplyPage
+GET           /FOSO/account/applyDetailPage               controllers.AccountController.applyDetailPage(id:Int)
+
+GET           /FOSO/audit/auditPage                       controllers.AuditController.auditPage
+POST          /FOSO/audit/getAuditData                    controllers.AuditController.getAuditData
+POST          /FOSO/audit/getPreviewPdfById               controllers.AuditController.getPreviewPdfById(id:Int)
+POST          /FOSO/audit/updateApplyStatus               controllers.AuditController.updateApplyStatus(id:Int,status:String)
+POST          /FOSO/audit/updateApplySign                 controllers.AuditController.updateApplySign(id:Int,signCode:String)
+
+GET           /FOSO/audit/teamAuditPage                   controllers.AuditController.teamAuditPage
+POST          /FOSO/audit/getTeamAuditData                controllers.AuditController.getTeamAuditData
+POST          /FOSO/audit/updateTeamApplyStatus           controllers.AuditController.updateTeamApplyStatus(id:Int,status:String)
+POST          /FOSO/audit/updateTeamApplySign             controllers.AuditController.updateTeamApplySign(id:Int,signCode:String)
+
+GET           /FOSO/audit/projectAuditPage                controllers.AuditController.projectAuditPage
+POST          /FOSO/audit/getProjectAuditData             controllers.AuditController.getProjectAuditData
+POST          /FOSO/audit/updateProjectApplyStatus        controllers.AuditController.updateProjectApplyStatus(id:Int,status:String)
+POST          /FOSO/audit/updateProjectApplySign          controllers.AuditController.updateProjectApplySign(id:Int,signCode:String)
+
+GET           /FOSO/sign/uploadSignPage                   controllers.SignatureController.uploadSignPage
+POST          /FOSO/sign/uploadSign                       controllers.SignatureController.uploadSign
+GET           /FOSO/sign/getImageByPath                   controllers.SignatureController.getImageByPath
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)
+
+      

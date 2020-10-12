@@ -1,0 +1,199 @@
+@()(implicit session: Session)
+@report.main("申请审核") {
+
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-external-link  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;申请审核&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered" id="table" style="text-align: center;">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="commitBackdrop" data-backdrop="commit" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="commitBackdropLabel" >
+        <div class="modal-dialog modal-dialog-scrollable  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">查看申请</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-hover" id="tablePreview">
+
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex;
+                       ">
+                    <button type="button" class="btn btn-primary" id="agreeBtn" >同意</button>
+                    <button type="button" class="btn btn-danger" id="refuseBtn" >拒绝</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("sweetalert2/sweetalert2.min.css")">
+    <script src="@routes.Assets.versioned("sweetalert2/sweetalert2.min.js")"></script>
+
+    <script>
+
+            $(function () {
+                $("#table").bootstrapTable({
+                    columns: [{
+                        field: "operation",
+                        title: "操作",
+                        formatter: function (i, v) {
+                            return `<button class='btn btn-inverse-secondary btn-rounded btn-fw'  onclick='openPreview(${v.id})' style='margin-right: 10px'>查看申请</button>`;
+                        }
+                    }, {
+                        field: "applyStatus",
+                        title: "申请状态",
+                        formatter: function (i, v) {
+                            return validAudit(v.applyStatus)
+                        }
+                    }, {
+                        field: "auditTime",
+                        title: "审核时间"
+                    }, {
+                        field: "signType",
+                        title: "签名方式",
+                        formatter: function (i, v) {
+                            if (v.signType === "0") {
+                                return "未选择";
+                            } else if (v.signType === "1") {
+                                return `线上签名`;
+                            } else if (v.signType === "2") {
+                                return `线下签名`;
+                            }
+                        }
+                    }, {
+                        field: "sample",
+                        title: "病原微生物名称"
+                    }, {
+                        field: "applyCode",
+                        title: "申请编号"
+                    }, {
+                        field: "applyTime",
+                        title: "申请时间"
+                    }, {
+                        field: "applyPeople",
+                        title: "申请人"
+                    }]
+                })
+
+                UpdateTable()
+            })
+
+            function UpdateTable() {
+                $.post("@routes.AuditController.getAuditData()", (data) => {
+                    $("#table").bootstrapTable("load", data)
+                })
+            }
+
+            function validAudit(obj) {
+                if (obj === "0") {
+                    return "未审核";
+                } else if (obj === "1") {
+                    return `<span style="color: green">同意</span>`;
+                } else if (obj === "2") {
+                    return `<span style="color: red">不同意</span>`;
+                }
+            }
+
+            function openPreview(obj) {
+                $.post("/FOSO/audit/getPreviewPdfById?id=" + obj, (data) => {
+                    let html = `
+<tr><th>申请时间</th><td>${data.applyTime}</td></tr>
+<tr><th>申请编号</th><td>${data.applyCode}</td></tr>
+<tr><th>病原微生物名称</th><td>${data.sampleName}</td></tr>
+<tr><th>样品名称/类型</th><td>${data.sampleType}</td></tr>
+<tr><th>灭活方式</th><td>${data.inactivation}</td></tr>
+<tr><th>灭活方式是否经过验证</th><td>${data.verifiedInactivation}</td></tr>
+<tr><th>样品编号</th><td>${data.sampleCode}</td></tr>
+<tr><th>样品编号</th><td>${data.outNums}</td></tr>
+<tr><th>用途</th><td>${data.application}</td></tr>
+<tr><th>带出后保存地点</th><td>${data.position}</td></tr>
+`
+                    $("#tablePreview").html(html);
+                    $("#agreeBtn").attr("onclick", "agreeApply('" + obj + "','1')")
+                    $("#refuseBtn").attr("onclick", "agreeApply('" + obj + "','2')")
+                    $("#commitBackdrop").modal("show")
+
+                })
+            }
+
+            function agreeApply(obj, status) {
+                $.post("/FOSO/audit/updateApplyStatus?id=" + obj + "&status=" + status, data => {
+                    if (data.code === 400) {
+                        swal("错误", data.error, "error")
+                    } else {
+                        if (status == 2) {
+                            Swal.fire('审核成功', '', 'success')
+                            UpdateTable();
+                        } else {
+                            Swal.fire({
+                                icon: "success",
+                                title: '审核成功',
+                                showDenyButton: true,
+                                confirmButtonText: `线上签名`,
+                                denyButtonText: `线下签名`,
+                            }).then((result) => {
+                                let signCode = 2
+                                if (result.isConfirmed) {
+                                    signCode = 1
+                                }
+                                $.post("/FOSO/audit/updateApplySign?id=" + obj + "&signCode=" + signCode, data => {
+                                    if (data.code === 400) {
+                                        swal("错误", data.error, "error")
+                                    } else if(data.code === 401){
+                                        Swal.fire({
+                                            icon: "warning",
+                                            title: '未检测到电子签名，请先上传',
+                                            confirmButtonText: `线上签名`
+                                        }).then((result)=>{
+                                            window.location.href="@routes.SignatureController.uploadSignPage()"
+                                        })
+                                    }else {
+                                        if (result.isConfirmed) {
+                                            Swal.fire('成功', '线上签名', 'success')
+                                        } else if (result.isDenied) {
+                                            Swal.fire('说明', '选择线下签名，当审核通过后，申请人形成纸质版文件，请在纸质版文件上签名', 'success')
+                                        }
+                                        UpdateTable();
+                                    }
+                                })
+                            })
+                        }
+                        $("#commitBackdrop").modal("hide")
+                    }
+
+                })
+            }
+
+
+    </script>
+
+}

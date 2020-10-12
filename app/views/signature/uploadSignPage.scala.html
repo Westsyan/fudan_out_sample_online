@@ -1,0 +1,108 @@
+@()(implicit session: Session)
+@report.main("上传签名") {
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-external-link  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;上传签名&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="form">
+
+                            <div class="row" >
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">上传签名文件:</label>
+                                        <div class="col-sm-6">
+                                            <input type="file" name="file" class="file-upload-default" accept=".jpg,.png,jpeg" style="width: 500px">
+                                            <div class="input-group col-xs-12">
+                                                <input type="text" class="form-control file-upload-info" disabled placeholder="上传签名文件">
+                                                <span class="input-group-append">
+                                                    <button class="file-upload-browse btn btn-primary" type="button">
+                                                        浏览</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-2"></div>
+                                        <button type="button" class="btn btn-primary" style="width: 200px" onclick="UploadSign()">
+                                            上传</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+
+                        <div class="row" >
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">签名预览:</label>
+                                    <div class="col-sm-6" id="signImg">
+                                        <img src="/FOSO/sign/getImageByPath" width="500px"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="@routes.Assets.versioned("modelb/js/file-upload.js")" type="text/javascript"></script>
+
+    <script>
+
+
+            function UploadSign() {
+                $.ajax({
+                    url: "@routes.SignatureController.uploadSign()",
+                    type: "post",
+                    processData: false,
+                    contentType: false,
+                    data: new FormData($("#form")[0]),
+                    success: function (data) {
+                        if (data.code === 400) {
+                            swal("\n错误", data.error, "error")
+                        } else {
+
+                            swal({
+                                        title: "\n成功",
+                                        text: "上传电子签名成功\n\n",
+                                        type: "success",
+                                        showConfirmButton: true,
+                                        confirmButtonClass: "btn-primary",
+                                        confirmButtonText: "确定",
+                                        closeOnConfirm: false,//设置为false才可以触发双重swal
+                                    },
+                                    function () {
+                                        window.location.reload();
+                                    });
+
+
+                        }
+                    }
+                })
+            }
+
+    </script>
+
+
+}

@@ -1,0 +1,104 @@
+@()(implicit session: Session)
+@report.main("") {
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <div class="d-flex align-items-end flex-wrap">
+                        <div class="d-flex">
+                            <i class="fa fa-user-o  text-muted hover-cursor"></i>
+                            <p class="text-muted mb-0 hover-cursor">&nbsp;&nbsp;账号管理&nbsp;&nbsp;</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered" id="table" style="text-align: center;">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+            $(function () {
+                    $("#table").bootstrapTable({
+                        columns: [{
+                            field: "phone",
+                            title: "手机号"
+                        }, {
+                            field: "name",
+                            title: "姓名"
+                        }, {
+                            field: "post",
+                            title: "职位"
+                        }, {
+                            field: "operation",
+                            title: "操作",
+                            formatter: function (i, v) {
+                                let log = `<button class=\"btn btn-inverse-danger btn-rounded btn-fw\" onclick="DeleteById('${v.id}')"  style='margin-right: 10px' >删除用户</button>`;
+                                let de = "<button class='btn btn-inverse-secondary btn-rounded btn-fw'  style='margin-right: 10px'>更改权限</button>";
+                                return  log;
+                            }
+                        }]
+                    })
+                UpdateTable();
+            })
+
+
+
+
+
+            function UpdateTable() {
+                $.post("@routes.AccountController.getAllUser()", (data) => {
+                    $("#table").bootstrapTable("load",data)
+                })
+            }
+
+            function DeleteById(id) {
+                swal({
+                            title: "",
+                            text: "删除用户可能导致部分用户数据失效，确定删除？\n\n",
+                            type: "warning",
+                            showCancelButton: true,
+                            showConfirmButton: true,
+                            confirmButtonClass: "btn-danger",
+                            confirmButtonText: "确定",
+                            closeOnConfirm: false,//设置为false才可以触发双重swal
+                            cancelButtonClass: "btn-outline-danger",
+                            cancelButtonText: "取消"
+                        },
+                        function () {
+                            let index = layer.load(1, {
+                                shade: [0.1, '#fff']
+                            });
+                            $.ajax({
+                                url: "/FOSO/account/deleteUserById?id=" + id,
+                                type: "delete",
+                                success: function () {
+                                    swal("", "\n删除成功！\n", "success")
+                                    layer.close(index);
+                                    UpdateTable();
+                                }
+                            });
+                        });
+            }
+
+
+
+
+
+    </script>
+
+
+}
