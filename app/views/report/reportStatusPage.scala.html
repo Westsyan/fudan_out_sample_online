@@ -63,7 +63,11 @@
             <div class="col-md-12 stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-bordered" id="table" style="text-align: center;">
+                        <table class="table table-bordered" id="table" style="text-align: center;"
+                        data-show-export="true" data-export-types="['excel']" data-export-data-type="all"
+                        data-tollbar-align="left"
+                        data-pagination="true" data-search="true"
+                        data-toolbar="#toolbar" data-page-list="[10, 25, 50, 100]" data-search-align="left" data-multiple-search="true">
 
                         </table>
                     </div>
@@ -121,13 +125,13 @@
                                 rowspan: 2
                             }, {
                                 title: "课题组",
-                                colspan: 2
+                                colspan: 3
                             }, {
                                 title: "接收部门",
-                                colspan: 2
+                                colspan: 3
                             },{
                                 title: "项目",
-                                colspan: 2
+                                colspan: 3
                             },{
                                 field: "download",
                                 title: "下载申请报告",
@@ -144,7 +148,10 @@
                                 formatter: function (value, row) {
                                     return validAudit(row.teamAudit);
                                 }
-                            }, {
+                            },  {
+                                field: "teamAuditTime",
+                                title: "审核时间"
+                            },{
                                 field: "department",
                                 title: "负责人"
                             },{
@@ -154,6 +161,9 @@
                                     return validAudit(row.departmentAudit);
                                 }
                             }, {
+                                field: "departmentAuditTime",
+                                title: "审核时间"
+                            },{
                                 field: "project",
                                 title: "负责人"
                             }, {
@@ -162,6 +172,9 @@
                                 formatter: function (value, row) {
                                     return validAudit(row.projectAudit);
                                 }
+                            },{
+                                field: "projectAuditTime",
+                                title: "审核时间"
                             }]
                         ]
                     })

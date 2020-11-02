@@ -40,7 +40,6 @@ object SendValidMessage {
     service.scheduleAtFixedRate(runnable, 1, 10, TimeUnit.MINUTES)
   }
 
-
   def sendMessage(phone: String, row: AliyunKeyRow) = {
     System.setProperty("sun.net.client.defaultConnectTimeout", "10000")
     System.setProperty("sun.net.client.defaultReadTimeout", "10000")
@@ -67,6 +66,50 @@ object SendValidMessage {
     } else {
       println(sendSmsResponse.getCode)
       (false, code, responseCode)
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    sendMessageApplicat("13818161194","薛为琪")
+  }
+
+  def sendMessageApplicat(phone: String, mtname:String) = {
+    sendMessageApply(phone,aliyunKeyRow,mtname,"SMS_204755960")
+  }
+
+  def sendMessagePass(phone: String, mtname:String) = {
+    sendMessageApply(phone,aliyunKeyRow,mtname,"SMS_204746115")
+  }
+
+  def sendMessageNoPass(phone: String, mtname:String) = {
+    sendMessageApply(phone,aliyunKeyRow,mtname,"SMS_204760873")
+  }
+
+  def sendMessageApply(phone: String, row: AliyunKeyRow,mtname:String,code:String) = {
+    System.setProperty("sun.net.client.defaultConnectTimeout", "10000")
+    System.setProperty("sun.net.client.defaultReadTimeout", "10000")
+    val product = "Dysmsapi"
+    val domain = "dysmsapi.aliyuncs.com"
+    val accessKeyId = row.keyId
+    val accessKeySecret = row.secret
+    val profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret)
+    DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain)
+    val acsClient = new DefaultAcsClient(profile)
+    val request = new SendSmsRequest
+    request.setMethod(MethodType.POST)
+    request.setPhoneNumbers(phone)
+    request.setSignName("带出样本在线申请系统")
+    request.setTemplateCode(code)
+    val json = Json.obj("mtname" -> mtname)
+    val jsonString = Json.stringify(json)
+    request.setTemplateParam(jsonString)
+    val sendSmsResponse = acsClient.getAcsResponse(request)
+    val responseCode = sendSmsResponse.getCode
+    if (sendSmsResponse.getCode != null && sendSmsResponse.getCode.equals("OK")) {
+      (true, responseCode)
+    } else {
+      println(sendSmsResponse.getCode)
+      (false, responseCode)
     }
   }
 

@@ -1,26 +1,26 @@
-.brand-logo{
+.brand-logo {
     text-align: center;
     font-size: 18px;
 }
 
-.code{
+.code {
     width: 60px;
     margin-left: 5px;
 }
 
-.input-height{
+.input-height {
     height: 45px;
 }
 
 /*formvalidation验证位置*/
-.help-block{
+.help-block {
     position: absolute;
     display: block;
     color: red;
 }
 
 
-.collapse{
+.collapse {
     visibility: unset;
 }
 
@@ -36,7 +36,7 @@
     color: red;
 }
 
-a:hover{
+a:hover {
     text-decoration: unset !important;
 }
 
@@ -66,7 +66,7 @@ select.form-control {
     text-align: right;
 }
 
-.my-brand-logo{
+.my-brand-logo {
     display: none;
 }
 
@@ -83,4 +83,13 @@ select.form-control {
     color: #2D8B67;
 }
 
+.btn-secondary {
+    background-color: white;
+    border: none;
+    box-shadow: none;
+    color: #2D8B67;
+}
 
+.export{
+    padding-top: 10px!important;
+}

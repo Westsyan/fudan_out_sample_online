@@ -1,16 +1,19 @@
 package controllers
 
 import config.{MyAwait, MyFile, MyRequest}
-import dao.{ApplyReportDao, UserDao}
+import dao.{ApplyReportDao, ApplyReportGdDao, UserDao}
 import javax.inject.Inject
-import models.Tables.{ApplyreportRow, UserRow}
+import models.Tables.{ApplyreportGdRow, ApplyreportRow, UserRow}
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
-import utils.{Global, Utils}
+import utils.{Global, SendValidMessage, Utils}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuditController @Inject()(cc: ControllerComponents, applyDao: ApplyReportDao, userDao: UserDao)
+class AuditController @Inject()(cc: ControllerComponents,
+                                applyDao: ApplyReportDao,
+                                userDao: UserDao,
+                                applyreportGdDao:ApplyReportGdDao)
                                (implicit exec: ExecutionContext) extends AbstractController(cc) with MyRequest with MyFile with MyAwait {
 
 
@@ -61,8 +64,13 @@ class AuditController @Inject()(cc: ControllerComponents, applyDao: ApplyReportD
 
   def getPreviewPdfById(id: Int) = Action.async { implicit request =>
     applyDao.getDataById(id).map { x =>
+      val verifiedInactivation = x.verifiedInactivation match {
+        case "on" =>"是"
+        case _ => "否"
+      }
+
       Ok(Json.obj("id" -> x.id, "applyTime" -> x.times, "applyCode" -> x.applyCode, "sampleName" -> x.sampleName,
-        "sampleType" -> x.sampleType, "inactivation" -> x.inactivation, "verifiedInactivation" -> x.verifiedInactivation,
+        "sampleType" -> x.sampleType, "inactivation" -> x.inactivation, "verifiedInactivation" -> verifiedInactivation,
         "sampleCode" -> x.sampleCode, "application" -> x.application, "outNums" -> x.outNums, "position" -> x.position))
     }
   }
@@ -76,11 +84,29 @@ class AuditController @Inject()(cc: ControllerComponents, applyDao: ApplyReportD
       }
       try {
         val date = Utils.date
+        val user = userDao.getById(x.userid).toAwait
         if (request.userId == postId.toInt) {
           request.post match {
             case "课题组负责人" => applyDao.updateTeamStatus(id, status, date).toAwait
+              if(status == "1"){
+                val department = userDao.getById(x.department.toInt).toAwait
+                SendValidMessage.sendMessageApplicat(department.phone,user.name)
+              }else{
+                SendValidMessage.sendMessageNoPass(user.phone,x.applyCode)
+              }
             case "接收部门负责人" => applyDao.updateDepartmentStatus(id, status, date).toAwait
+              if(status == "1"){
+                val project = userDao.getById(x.project.toInt).toAwait
+                SendValidMessage.sendMessageApplicat(project.phone,user.name)
+              }else{
+                SendValidMessage.sendMessageNoPass(user.phone,x.applyCode)
+              }
             case "项目负责人" => applyDao.updateProjectStatus(id, status, date).toAwait
+              if(status == "1"){
+                SendValidMessage.sendMessagePass(user.phone,x.applyCode)
+              }else{
+                SendValidMessage.sendMessageNoPass(user.phone,x.applyCode)
+              }
           }
         }
         Ok(Json.obj("code" -> 200))
@@ -141,6 +167,14 @@ class AuditController @Inject()(cc: ControllerComponents, applyDao: ApplyReportD
         if (request.userId == x.team.toInt) {
           applyDao.updateTeamStatus(id, status, date).toAwait
         }
+        val user = userDao.getById(x.userid).toAwait
+        if(status == "1"){
+          val department = userDao.getById(x.department.toInt).toAwait
+          println(department.phone)
+          SendValidMessage.sendMessageApplicat(department.phone,user.name)
+        }else{
+          SendValidMessage.sendMessageNoPass(user.phone,x.applyCode)
+        }
         Ok(Json.obj("code" -> 200))
       } catch {
         case e: Exception => Ok(Json.obj("code" -> 400, "error" -> e.getMessage))
@@ -184,6 +218,15 @@ class AuditController @Inject()(cc: ControllerComponents, applyDao: ApplyReportD
         val date = Utils.date
         if (request.userId == x.project.toInt) {
           applyDao.updateProjectStatus(id, status, date).toAwait
+        }
+        val user = userDao.getById(x.userid).toAwait
+        if(status == "1"){
+          if(!applyreportGdDao.existByReportId(id).toAwait){
+            applyreportGdDao.addRow(ApplyreportGdRow(0,id)).toAwait
+          }
+          SendValidMessage.sendMessagePass(user.phone,x.applyCode)
+        }else{
+          SendValidMessage.sendMessageNoPass(user.phone,x.applyCode)
         }
         Ok(Json.obj("code" -> 200))
       } catch {

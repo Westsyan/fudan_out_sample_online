@@ -19,7 +19,10 @@
             <div class="col-md-12 stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-bordered" id="table" style="text-align: center;">
+                        <table class="table table-bordered" id="table" style="text-align: center;"
+                        data-pagination="true" data-search="true"
+                        data-toolbar="#toolbar" data-page-list="[10, 25, 50, 100]" data-search-align="left" data-multiple-search="true"
+                        >
 
                         </table>
                     </div>
@@ -42,7 +45,7 @@
                         }, {
                             field: "post",
                             title: "职位"
-                        }, {
+                        }/*, {
                             field: "operation",
                             title: "操作",
                             formatter: function (i, v) {
@@ -50,7 +53,7 @@
                                 let de = "<button class='btn btn-inverse-secondary btn-rounded btn-fw'  style='margin-right: 10px'>更改权限</button>";
                                 return  log;
                             }
-                        }]
+                        }*/]
                     })
                 UpdateTable();
             })

@@ -1,17 +1,21 @@
 package controllers
 
-import config.{MyFile, MyRequest}
-import dao.{ApplyReportDao, UserDao}
+import config.{MyAwait, MyFile, MyRequest}
+import dao.{ApplicatAuditPersonDao, ApplyReportDao, ApplyReportGdDao, UserDao}
 import javax.inject.Inject
 import models.Tables.ApplyreportRow
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents, Result}
-import utils.{CreatePdf, Global, Utils}
+import utils.{CreatePdf, Global, SendValidMessage, Utils}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReportDao, userDao: UserDao)
-                                (implicit exec: ExecutionContext) extends AbstractController(cc) with MyRequest with MyFile {
+class ReportController @Inject()(cc: ControllerComponents,
+                                 applyDao: ApplyReportDao,
+                                 applyGdDao:ApplyReportGdDao,
+                                 userDao: UserDao,
+                                 applicatDao: ApplicatAuditPersonDao)
+                                (implicit exec: ExecutionContext) extends AbstractController(cc) with MyRequest with MyFile with MyAwait{
 
   def reportApplyPage = Action { implicit request =>
     if (request.post == "申请人") {
@@ -29,12 +33,17 @@ class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReport
       data => {
         val time = Utils.date
         val id = request.userId
-        val inactivation = if (data.inactivation == "other") data.inactivation_other.getOrElse("") else data.inactivation
-        val row = ApplyreportRow(0, id,data.project_name,data.project_code, time, "", data.sample_name, data.sample_type, inactivation,
-          data.verified_inactivation, data.sample_code, data.out_nums, data.application, data.position, data.team,
-          data.department, data.project, "0", "0", "0", "", "", "", "0", "0", "0")
-        applyDao.addApplyReport(row).map { x =>
-          Ok(Json.obj("code" -> 200))
+        applicatDao.getById(id).flatMap { post =>
+          val team = userDao.getById(post.team).toAwait
+          val user = userDao.getById(id).toAwait
+          val inactivation = if (data.inactivation == "other") data.inactivation_other.getOrElse("") else data.inactivation
+          val row = ApplyreportRow(0, id, data.project_name, data.project_code, time, "", data.sample_name, data.sample_type, inactivation,
+            data.verified_inactivation, data.sample_code, data.out_nums, data.application, data.position, post.team.toString,
+            post.department.toString, post.project.toString, "0", "0", "0", "", "", "", "0", "0", "0")
+          applyDao.addApplyReport(row).map { x =>
+            SendValidMessage.sendMessageApplicat(team.phone,user.name)
+            Ok(Json.obj("code" -> 200))
+          }
         }
       }
     )
@@ -54,11 +63,10 @@ class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReport
         val json =
           x.sortBy(_.times).reverse.map { y =>
             Json.obj("id" -> y.id, "applyCode" -> y.applyCode, "sample" -> y.sampleName, "times" -> y.times,
-              "team" -> user.find(_.id == y.team.toInt).get.name, "teamAudit" -> y.teamAudit,
-              "department" -> user.find(_.id == y.department.toInt).get.name, "departmentAudit" -> y.departmentAudit,
-              "project" -> user.find(_.id == y.project.toInt).get.name, "projectAudit" -> y.projectAudit)
+              "team" -> user.find(_.id == y.team.toInt).get.name, "teamAudit" -> y.teamAudit, "teamAuditTime" -> y.teamTime, "teamAuditSign" -> y.teamSign,
+              "department" -> user.find(_.id == y.department.toInt).get.name, "departmentAudit" -> y.departmentAudit, "departmentAuditTime" -> y.departmentTime,
+              "project" -> user.find(_.id == y.project.toInt).get.name, "projectAudit" -> y.projectAudit, "projectAuditTime" -> y.projectTime)
           }
-
         Ok(Json.toJson(json))
       }
     }
@@ -70,10 +78,10 @@ class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReport
         userDao.getAllUser.map { user =>
           val json =
             x.sortBy(_.times).reverse.map { y =>
-              Json.obj("id" -> y.id, "applyCode" -> y.applyCode,"applyPerson" -> user.find(_.id == y.userid).get.name, "sample" -> y.sampleName, "times" -> y.times,
-                "team" -> user.find(_.id == y.team.toInt).get.name, "teamAudit" -> y.teamAudit,"teamAuditTime" -> y.teamTime,"teamAuditSign" -> y.teamSign,
-                "department" -> user.find(_.id == y.department.toInt).get.name, "departmentAudit" -> y.departmentAudit,
-                "project" -> user.find(_.id == y.project.toInt).get.name, "projectAudit" -> y.projectAudit)
+              Json.obj("id" -> y.id, "applyCode" -> y.applyCode, "applyPerson" -> user.find(_.id == y.userid).get.name, "sample" -> y.sampleName, "times" -> y.times,
+                "team" -> user.find(_.id == y.team.toInt).get.name, "teamAudit" -> y.teamAudit, "teamAuditTime" -> y.teamTime, "teamAuditSign" -> y.teamSign,
+                "department" -> user.find(_.id == y.department.toInt).get.name, "departmentAudit" -> y.departmentAudit, "departmentAuditTime" -> y.departmentTime,
+                "project" -> user.find(_.id == y.project.toInt).get.name, "projectAudit" -> y.projectAudit, "projectAuditTime" -> y.projectTime)
             }
           Ok(Json.toJson(json))
         }
@@ -81,10 +89,10 @@ class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReport
     )
   }
 
-  def SuccessOrFutureError(position:Boolean,x:Future[Result])  = {
-    if(position){
+  def SuccessOrFutureError(position: Boolean, x: Future[Result]) = {
+    if (position) {
       x
-    }else{
+    } else {
       Future.successful(BadRequest)
     }
   }
@@ -98,7 +106,11 @@ class ReportController @Inject()(cc: ControllerComponents, applyDao: ApplyReport
 
         def getUser(id: String) = user.find(_.id == id.toInt).get.name
 
-        CreatePdf.createPdf(path, x, getUser(x.team), getUser(x.department), getUser(x.project))
+        val gdRow = applyGdDao.getIdByReportId(id).toAwait
+
+        val gd = if(gdRow.isEmpty) 0 else gdRow.head.id
+
+        CreatePdf.createPdf(path, x, getUser(x.team), getUser(x.department), getUser(x.project),gd)
         Ok.sendFile(path.toFile).withHeaders(
           //缓存
           CACHE_CONTROL -> "max-age=3600",

@@ -196,17 +196,17 @@
                                 <div class="col-md-12" style="margin-top: 20px">
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label"> 课题组负责人:</label>
-                                        <div class="col-sm-4">
-                                            <select class="form-control" name="team" id="team"></select>
+                                        <div class="col-sm-4" style="line-height: 36px">
+                                            <span id="team"></span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-12" style="margin-top: 20px">
                                     <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label"> 接受部门负责人:</label>
-                                        <div class="col-sm-4">
-                                            <select class="form-control" name="department" id="department"></select>
+                                        <label class="col-sm-2 col-form-label"> 接收部门负责人:</label>
+                                        <div class="col-sm-4"  style="line-height: 36px">
+                                            <span id="department"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -214,8 +214,8 @@
                                 <div class="col-md-12" style="margin-top: 20px">
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label"> 项目负责人:</label>
-                                        <div class="col-sm-4">
-                                            <select class="form-control" name="project" id="project"></select>
+                                        <div class="col-sm-4"  style="line-height: 36px">
+                                            <span id="project"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -242,10 +242,10 @@
     <script>
 
             $(function () {
-                $.post("@routes.ReportController.getAllAuditPeople()", (data) => {
-                    $("#team").select2({data:data.team})
-                    $("#department").select2({data:data.department})
-                    $("#project").select2({data:data.project})
+                $.post("@routes.AccountController.getAuditPeople()", (data) => {
+                    $("#team").text(data.team)
+                    $("#department").text(data.department)
+                    $("#project").text(data.project)
                 })
 
                 Formvalidation();

@@ -20,7 +20,12 @@
             <div class="col-md-12 stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-bordered" id="table" style="text-align: center;">
+                        <table class="table table-bordered" id="table" style="text-align: center;"
+                        data-show-export="true" data-export-types="['excel']" data-export-data-type="all"
+                        data-tollbar-align="left"
+                        data-pagination="true" data-search="true"
+                        data-toolbar="#toolbar" data-page-list="[10, 25, 50, 100]" data-search-align="left" data-multiple-search="true">
+
 
                         </table>
                     </div>
@@ -136,7 +141,7 @@
 <tr><th>灭活方式</th><td>${data.inactivation}</td></tr>
 <tr><th>灭活方式是否经过验证</th><td>${data.verifiedInactivation}</td></tr>
 <tr><th>样品编号</th><td>${data.sampleCode}</td></tr>
-<tr><th>样品编号</th><td>${data.outNums}</td></tr>
+<tr><th>带出数量</th><td>${data.outNums}</td></tr>
 <tr><th>用途</th><td>${data.application}</td></tr>
 <tr><th>带出后保存地点</th><td>${data.position}</td></tr>
 `

@@ -29,7 +29,8 @@ class SignatureController @Inject()(cc: ControllerComponents)
       println(request.body.file("file"))
       request.body.file("file").get.ref.moveTo(s"$dir/sign.jpg".toFile, replace = true)
 
-      CreatePdf.createSignPdf(request.userId, request.post)
+        CreatePdf.createSignPdf(request.userId, request.post)
+
       val path = s"${Global.path}/data/${request.userId}"
       pdfToPng.pdf2Png(s"$path/sign.pdf", s"$path/signPdf.png")
 

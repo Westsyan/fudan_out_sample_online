@@ -49,8 +49,8 @@ object FormUtils {
   )
 
   case class ApplyReportData(project_name:String,project_code:String,sample_name: String, sample_type: String, inactivation: String, inactivation_other: Option[String],
-                             verified_inactivation: String, sample_code: String, out_nums: String, application: String, position: String,
-                             team: String, department: String, project: String)
+                             verified_inactivation: String, sample_code: String, out_nums: String, application: String, position: String
+                            )
 
   val ApplyReportForm = Form(
     mapping(
@@ -64,10 +64,7 @@ object FormUtils {
       "sample_code" -> text,
       "out_nums" -> text,
       "application" -> text,
-      "position" -> text,
-      "team" -> text,
-      "department" -> text,
-      "project" -> text
+      "position" -> text
     )(ApplyReportData.apply)(ApplyReportData.unapply)
   )
 

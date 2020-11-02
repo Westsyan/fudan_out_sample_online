@@ -14,7 +14,7 @@ object CreatePdf extends MyFile {
 
   val BLACK = new DeviceRgb(34, 24, 21) //黑色
 
-  def createPdf(outpath: String, row: ApplyreportRow,team:String,department:String,project:String) = {
+  def createPdf(outpath: String, row: ApplyreportRow, team: String, department: String, project: String, gd: Int) = {
 
     val font = PdfFontFactory.createFont("STSongStd-Light", "UniGB-UCS2-H", false)
     val writer = new PdfWriter(outpath)
@@ -27,15 +27,28 @@ object CreatePdf extends MyFile {
     val pageWidth = pageSize.getWidth
     val pageHeight = pageSize.getHeight
 
+
+    Itext7.addLeftText(document, "归档编号：", 10, 55f, pageHeight - 45f, 100f, font)
+
+    if (gd != 0) {
+      val gdCode = "GD-" + "0" * (6 - gd.toString.length) + gd
+      Itext7.addLeftText(document, gdCode, 10, 105f, pageHeight - 45f, 100f, font)
+    }
+
     Itext7.addRectangleWithoutBackgroundColor(canvas, 50f, 50f, pageWidth - 100f, pageHeight - 100f, 1f, new DeviceRgb(62, 62, 63))
 
     val title = new Paragraph("带出样本申请表").setFont(font).setFontSize(20).setFontColor(BLACK).
       setTextAlignment(TextAlignment.CENTER).setFixedPosition(1, 0f, pageHeight - 110f, pageWidth)
     document.add(title)
 
-    val data = Map("项目名称" -> row.projectName,"项目编号" -> row.projectCode,"申请时间" -> row.times,
+    val verifiedInactivation = row.verifiedInactivation match {
+      case "on" =>"是"
+      case _ => "否"
+    }
+
+    val data = Map("项目名称" -> row.projectName, "项目编号" -> row.projectCode, "申请时间" -> row.times,
       "申请编号" -> row.applyCode, "病原微生物名称" -> row.sampleName,
-      "样品名称/类型" -> row.sampleType, "灭活方式" -> row.inactivation, "灭活方式是否经过验证" -> row.verifiedInactivation,
+      "样品名称/类型" -> row.sampleType, "灭活方式" -> row.inactivation, "灭活方式是否经过验证" -> verifiedInactivation,
       "样品编号" -> row.sampleCode, "带出数量" -> row.outNums, "用途" -> row.application, "带出后保存地点" -> row.position)
 
     val name = Array(Map("name" -> "项目编号", "height" -> "153"),
@@ -56,11 +69,17 @@ object CreatePdf extends MyFile {
     }
 
     //项目名称和申请时间的边框线与字段插入
-    Itext7.addSolidYLine(canvas, 300f, pageHeight - 130f, pageHeight-190f, BLACK)
-    Itext7.addSolidYLine(canvas, 400f, pageHeight - 130f, pageHeight-190f, BLACK)
+    Itext7.addSolidYLine(canvas, 300f, pageHeight - 130f, pageHeight - 190f, BLACK)
+    Itext7.addSolidYLine(canvas, 400f, pageHeight - 130f, pageHeight - 190f, BLACK)
 
     Itext7.addText2(document, "项目名称", pageHeight - 153f, font)
-    Itext7.addLeftText(document, row.projectName, 10, 415f, pageHeight - 153f, pageWidth - 225f, font)
+    if(row.projectName.length <=10 ){
+      Itext7.addLeftText(document, row.projectName, 10, 415f, pageHeight - 153f, pageWidth - 225f, font)
+    }else if(row.projectName.length <= 17){
+      Itext7.addLeftText(document, row.projectName, 8, 410f, pageHeight - 151f,200f, font)
+    }else{
+      Itext7.addLeftText(document, row.projectName, 8, 410f, pageHeight - 158f,130f, font)
+    }
 
     Itext7.addText2(document, "申请时间", pageHeight - 183f, font)
     Itext7.addLeftText(document, row.times, 10, 415f, pageHeight - 183f, pageWidth - 225f, font)
@@ -128,37 +147,37 @@ object CreatePdf extends MyFile {
 
     //填充负责人名称
     Itext7.addJustifiedText(document, team,
-      10, 222f + average * 3, pageHeight - 573f , 40f, font)
+      10, 222f + average * 3, pageHeight - 573f, 40f, font)
 
     Itext7.addJustifiedText(document, department,
-      10, 222f + average * 3, pageHeight - 633f , 40f, font)
+      10, 222f + average * 3, pageHeight - 633f, 40f, font)
 
     Itext7.addJustifiedText(document, project,
-      10, 222f + average * 3, pageHeight - 693f , 40f, font)
+      10, 222f + average * 3, pageHeight - 693f, 40f, font)
 
     //填充审核结果
     Itext7.addJustifiedText(document, auditCN(row.teamAudit),
-      10, 222f + average , pageHeight - 573f , 40f, font)
+      10, 222f + average, pageHeight - 573f, 40f, font)
 
     Itext7.addJustifiedText(document, auditCN(row.departmentAudit),
-      10, 222f + average , pageHeight - 633f , 40f, font)
+      10, 222f + average, pageHeight - 633f, 40f, font)
 
     Itext7.addJustifiedText(document, auditCN(row.projectAudit),
-      10, 222f + average , pageHeight - 693f , 40f, font)
+      10, 222f + average, pageHeight - 693f, 40f, font)
 
     Itext7.addLeftText(document, row.teamTime,
-      9, 208f + average , pageHeight - 603f , 80f, font)
+      9, 208f + average, pageHeight - 603f, 80f, font)
 
     Itext7.addLeftText(document, row.departmentTime,
-      9, 208f + average , pageHeight - 663f , 80f, font)
+      9, 208f + average, pageHeight - 663f, 80f, font)
 
     Itext7.addLeftText(document, row.projectTime,
-      9, 208f + average , pageHeight - 723f , 80f, font)
+      9, 208f + average, pageHeight - 723f, 80f, font)
 
     //填充电子签名
     if (row.teamAudit == "1" && row.teamSign == "1") {
       val sign = s"${Global.path}/data/${row.team}/sign.jpg"
-      Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3,  pageHeight - 608f, 25f)
+      Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 608f, 25f)
     }
 
     if (row.departmentAudit == "1" && row.departmentSign == "1") {
@@ -177,7 +196,7 @@ object CreatePdf extends MyFile {
     pdfDoc.close()
   }
 
-  def createSignPdf(id:Int,post:String) = {
+  def createSignPdf(id: Int, post: String) = {
 
     val path = s"${Global.path}/data/$id"
     val sign = s"$path/sign.jpg"
@@ -193,6 +212,9 @@ object CreatePdf extends MyFile {
     val pageSize = pdfDoc.getPage(1).getPageSize
     val pageWidth = pageSize.getWidth
     val pageHeight = pageSize.getHeight
+
+
+    Itext7.addLeftText(document, "归档编号：", 10, 55f, pageHeight - 45f, 100f, font)
 
     Itext7.addRectangleWithoutBackgroundColor(canvas, 50f, 50f, pageWidth - 100f, pageHeight - 100f, 1f, new DeviceRgb(62, 62, 63))
 
@@ -215,8 +237,8 @@ object CreatePdf extends MyFile {
     }
 
     //项目名称和申请时间的边框线与字段插入
-    Itext7.addSolidYLine(canvas, 300f, pageHeight - 130f, pageHeight-190f, BLACK)
-    Itext7.addSolidYLine(canvas, 400f, pageHeight - 130f, pageHeight-190f, BLACK)
+    Itext7.addSolidYLine(canvas, 300f, pageHeight - 130f, pageHeight - 190f, BLACK)
+    Itext7.addSolidYLine(canvas, 400f, pageHeight - 130f, pageHeight - 190f, BLACK)
 
     Itext7.addText2(document, "项目名称", pageHeight - 153f, font)
     Itext7.addText2(document, "申请时间", pageHeight - 183f, font)
@@ -257,10 +279,13 @@ object CreatePdf extends MyFile {
     }
 
 
-    post match{
-      case "课题组负责人" => Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3,  pageHeight - 608f, 25f)
+    post match {
+      case "课题组负责人" => Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 608f, 25f)
       case "接收部门负责人" => Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 668f, 25f)
       case "项目负责人" => Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 728f, 25f)
+      case "课题组负责人和项目负责人" =>
+        Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 608f, 25f)
+        Itext7.addImageToPdfByHeight(canvas, sign, 210f + average * 3, pageHeight - 728f, 25f)
     }
 
     document.close()

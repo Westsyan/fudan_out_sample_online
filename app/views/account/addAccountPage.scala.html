@@ -1,5 +1,6 @@
 @()(implicit session: Session)
 @report.main("") {
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("select2-4.0.3/dist/css/select2.css")">
 
     <style>
 
@@ -9,6 +10,10 @@
 
             .post-label {
                 margin-left: 20px;
+            }
+
+            .applicat {
+                display: none;
             }
 
     </style>
@@ -58,9 +63,9 @@
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label"> 职位:</label>
                                         <div class="col-sm-4">
-                                            <label class="col-form-label post-label "><input type="radio" name="post" value="申请人" checked>
+                                            <label class="col-form-label post-label "><input type="radio" name="post" value="申请人" id="applicatPost" disabled>
                                                 申请人</label>
-                                            <label class="col-form-label  post-label"><input type="radio" name="post" value="课题组负责人">
+                                            <label class="col-form-label  post-label"><input type="radio" name="post" value="课题组负责人" id="teamPost">
                                                 课题组负责人</label>
                                             <label class="col-form-label post-label "><input type="radio" name="post" value="接收部门负责人">
                                                 接收部门负责人</label>
@@ -68,9 +73,43 @@
                                                 项目负责人</label>
                                             <label class="col-form-label post-label "><input type="radio" name="post" value="课题组负责人和项目负责人">
                                                 课题组负责人和项目负责人</label>
+
+                                            <br/>
+                                            <span style="color: #2D8B67;
+                                                display: none" id="notic">注意：添加课题组负责人、接收部门负责人、项目负责人后才可以添加申请人账号</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-md-12 applicat">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 课题组负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="team" id="team"></select>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-md-12 applicat">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 接收部门负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="department" id="department"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 applicat">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label"> 项目负责人:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" name="project" id="project"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <div class="col-md-12">
                                     <div class="form-group row">
@@ -89,23 +128,59 @@
         </div>
     </div>
 
+    <script src="@routes.Assets.versioned("select2-4.0.3/dist/js/select2.js")" type="text/javascript"></script>
 
     <script>
 
 
             $(function () {
+
+                $.post("@routes.ReportController.getAllAuditPeople()", (data) => {
+                    $("#team").select2({data: data.team})
+                    $("#department").select2({data: data.department})
+                    $("#project").select2({data: data.project})
+
+                    if (data.team.length === 0 || data.department.length === 0 || data.project.length === 0) {
+                        $("#teamPost").attr("checked", "checked")
+                        $("#notic").show()
+                    } else {
+                        $("#applicatPost").removeAttr("disabled")
+                        $("#applicatPost").attr("checked", "checked")
+                        let post = $("input:radio[name=post]:checked").val()
+                        if (post === "申请人") {
+                            $(".applicat").show()
+                        } else {
+                            $(".applicat").hide()
+                        }
+                    }
+
+                })
+
                 addFormValidation();
+                //   $("#form").formValidation("revalidateField", "phone");
+
             })
+
+
+            $("input:radio[name=post]").change(function () {
+                if ($(this).val() === "申请人") {
+                    $(".applicat").show()
+                } else {
+                    $(".applicat").hide()
+                }
+            })
+
 
             function ApplyReport() {
                 let form = $("#form");
+                form.formValidation("revalidateField", "phone");
                 let fv = form.data("formValidation");
                 fv.validate();
                 if (fv.isValid()) {
                     $.ajax({
                         url: "@routes.AccountController.addUser()",
                         type: "post",
-                        data: $("#form").serialize(),
+                        data: form.serialize(),
                         success: function (data) {
                             if (data.code === 200) {
                                 swal("\n成功", "新增成功！", "success")
@@ -113,6 +188,8 @@
                         }
                     })
                 }
+
+
             }
 
 
@@ -137,8 +214,7 @@
                                 remote: {
                                     type: 'POST',
                                     url: '/phoneIsExsit',
-                                    message: `手机号已存在！`,
-                                    delay: 1000
+                                    message: `手机号已存在！`
                                 },
                             }
                         },

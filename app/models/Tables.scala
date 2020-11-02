@@ -18,7 +18,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Admin.schema ++ AliyunKey.schema ++ Applyreport.schema ++ User.schema
+  lazy val schema: profile.SchemaDescription = Array(Admin.schema, AliyunKey.schema, Applicatauditperson.schema, Applyreport.schema, ApplyreportGd.schema, User.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -82,6 +82,35 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table AliyunKey */
   lazy val AliyunKey = new TableQuery(tag => new AliyunKey(tag))
+
+  /** Entity class storing rows of table Applicatauditperson
+   *  @param userid Database column userid SqlType(INT), PrimaryKey
+   *  @param team Database column team SqlType(INT)
+   *  @param department Database column department SqlType(INT)
+   *  @param project Database column project SqlType(INT) */
+  case class ApplicatauditpersonRow(userid: Int, team: Int, department: Int, project: Int)
+  /** GetResult implicit for fetching ApplicatauditpersonRow objects using plain SQL queries */
+  implicit def GetResultApplicatauditpersonRow(implicit e0: GR[Int]): GR[ApplicatauditpersonRow] = GR{
+    prs => import prs._
+    ApplicatauditpersonRow.tupled((<<[Int], <<[Int], <<[Int], <<[Int]))
+  }
+  /** Table description of table applicatauditperson. Objects of this class serve as prototypes for rows in queries. */
+  class Applicatauditperson(_tableTag: Tag) extends profile.api.Table[ApplicatauditpersonRow](_tableTag, Some("fudan_out_sample_online"), "applicatauditperson") {
+    def * = (userid, team, department, project) <> (ApplicatauditpersonRow.tupled, ApplicatauditpersonRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = ((Rep.Some(userid), Rep.Some(team), Rep.Some(department), Rep.Some(project))).shaped.<>({r=>import r._; _1.map(_=> ApplicatauditpersonRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column userid SqlType(INT), PrimaryKey */
+    val userid: Rep[Int] = column[Int]("userid", O.PrimaryKey)
+    /** Database column team SqlType(INT) */
+    val team: Rep[Int] = column[Int]("team")
+    /** Database column department SqlType(INT) */
+    val department: Rep[Int] = column[Int]("department")
+    /** Database column project SqlType(INT) */
+    val project: Rep[Int] = column[Int]("project")
+  }
+  /** Collection-like TableQuery object for table Applicatauditperson */
+  lazy val Applicatauditperson = new TableQuery(tag => new Applicatauditperson(tag))
 
   /** Entity class storing rows of table Applyreport
    *  @param id Database column id SqlType(INT), AutoInc
@@ -181,12 +210,38 @@ trait Tables {
   /** Collection-like TableQuery object for table Applyreport */
   lazy val Applyreport = new TableQuery(tag => new Applyreport(tag))
 
+  /** Entity class storing rows of table ApplyreportGd
+   *  @param id Database column id SqlType(INT), AutoInc
+   *  @param reportId Database column report_id SqlType(INT) */
+  case class ApplyreportGdRow(id: Int, reportId: Int)
+  /** GetResult implicit for fetching ApplyreportGdRow objects using plain SQL queries */
+  implicit def GetResultApplyreportGdRow(implicit e0: GR[Int]): GR[ApplyreportGdRow] = GR{
+    prs => import prs._
+    ApplyreportGdRow.tupled((<<[Int], <<[Int]))
+  }
+  /** Table description of table applyreport_gd. Objects of this class serve as prototypes for rows in queries. */
+  class ApplyreportGd(_tableTag: Tag) extends profile.api.Table[ApplyreportGdRow](_tableTag, Some("fudan_out_sample_online"), "applyreport_gd") {
+    def * = (id, reportId) <> (ApplyreportGdRow.tupled, ApplyreportGdRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = ((Rep.Some(id), Rep.Some(reportId))).shaped.<>({r=>import r._; _1.map(_=> ApplyreportGdRow.tupled((_1.get, _2.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc)
+    /** Database column report_id SqlType(INT) */
+    val reportId: Rep[Int] = column[Int]("report_id")
+
+    /** Primary key of ApplyreportGd (database name applyreport_gd_PK) */
+    val pk = primaryKey("applyreport_gd_PK", (id, reportId))
+  }
+  /** Collection-like TableQuery object for table ApplyreportGd */
+  lazy val ApplyreportGd = new TableQuery(tag => new ApplyreportGd(tag))
+
   /** Entity class storing rows of table User
    *  @param id Database column id SqlType(INT), AutoInc
    *  @param phone Database column phone SqlType(VARCHAR), Length(255,true)
    *  @param pwd Database column pwd SqlType(TEXT)
    *  @param name Database column name SqlType(TEXT)
-   *  @param post Database column post SqlType(ENUM), Length(7,false) */
+   *  @param post Database column post SqlType(ENUM), Length(12,false) */
   case class UserRow(id: Int, phone: String, pwd: String, name: String, post: String)
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
   implicit def GetResultUserRow(implicit e0: GR[Int], e1: GR[String]): GR[UserRow] = GR{
@@ -207,8 +262,8 @@ trait Tables {
     val pwd: Rep[String] = column[String]("pwd")
     /** Database column name SqlType(TEXT) */
     val name: Rep[String] = column[String]("name")
-    /** Database column post SqlType(ENUM), Length(7,false) */
-    val post: Rep[String] = column[String]("post", O.Length(7,varying=false))
+    /** Database column post SqlType(ENUM), Length(12,false) */
+    val post: Rep[String] = column[String]("post", O.Length(12,varying=false))
 
     /** Primary key of User (database name user_PK) */
     val pk = primaryKey("user_PK", (id, phone))

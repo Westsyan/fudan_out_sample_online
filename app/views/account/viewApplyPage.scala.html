@@ -20,7 +20,12 @@
             <div class="col-md-12 stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-bordered" id="table" style="text-align: center;">
+                        <table class="table table-bordered" id="table" style="text-align: center;"
+                        data-show-export="true" data-export-types="['excel']" data-export-data-type="all"
+
+                        data-pagination="true" data-search="true"
+                        data-toolbar="#toolbar" data-page-list="[10, 25, 50, 100]" data-search-align="left" data-multiple-search="true"
+                        >
 
                         </table>
                     </div>
@@ -88,7 +93,7 @@
                                     return validAudit(row.departmentAudit);
                                 }
                             }, {
-                                field: "teamAuditTime",
+                                field: "departmentAuditTime",
                                 title: "审核时间"
                             },{
                                 field: "project",
@@ -100,7 +105,7 @@
                                     return validAudit(row.projectAudit);
                                 }
                             },{
-                                field: "teamAuditTime",
+                                field: "projectAuditTime",
                                 title: "审核时间"
                             }]
                         ]

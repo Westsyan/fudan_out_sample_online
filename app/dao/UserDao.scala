@@ -17,8 +17,8 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     db.run(User.filter(_.phone === phone).exists.result)
   }
 
-  def addUser(row: UserRow): Future[Unit] = {
-    db.run(User += row).map(_ => ())
+  def addUser(row: UserRow): Future[Int] = {
+    db.run(User returning User.map(_.id) += row)
   }
 
   def checkUser(phone: String, pwd: String): Future[Seq[UserRow]] = {
@@ -35,6 +35,10 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def getByIds(ids:Seq[Int]) : Future[Seq[UserRow]] = {
     db.run(User.filter(_.id.inSetBind(ids)).result)
+  }
+
+  def getById(id:Int) : Future[UserRow] = {
+    db.run(User.filter(_.id === id).result.head)
   }
 
   def deleteById(id:Int) : Future[Unit] = {
